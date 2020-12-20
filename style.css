@@ -1,6 +1,56 @@
-h1, h2, h3, h4, h5, h6, p {
-  color: #444;
-  font-weight: normal;
+:root {
+  --blue: #007bff;
+  --indigo: #6610f2;
+  --purple: #6f42c1;
+  --pink: #e83e8c;
+  --red: #dc3545;
+  --orange: #fd7e14;
+  --yellow: #ffc107;
+  --green: #28a745;
+  --teal: #20c997;
+  --cyan: #17a2b8;
+  --white: #fff;
+  --gray: #6c757d;
+  --gray-dark: #343a40;
+  --primary: #444;
+  --secondary: #6c757d;
+  --success: #28a745;
+  --info: #17a2b8;
+  --warning: #ffc107;
+  --danger: #dc3545;
+  --light: #f8f9fa;
+  --dark: #343a40;
+}
+
+.blue {
+  background-color: var(--blue);
+}
+.indigo {
+  background-color: var(--indigo);
+}
+.purple {
+  background-color: var(--purple);
+}
+.pink {
+  background-color: var(--pink);
+}
+.red {
+  background-color: var(--red);
+}
+.orange {
+  background-color: var(--orange);
+}
+.yellow {
+  background-color: var(--yellow);
+}
+.green {
+  background-color: var(--green);
+}
+.teal {
+  background-color: var(--teal);
+}
+.cyan {
+  background-color: var(--cyan);
 }
 
 body {
@@ -8,7 +58,30 @@ body {
   font-family: Arial unicode MS,sans-serif;
 }
 
-input {
+hr {
+  width: 100%;
+  border-top: 1px solid rgba(0,0,0,.1);;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  color: var(--primary);
+  font-weight: normal;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+h1 {
+  margin: 12px 0 20px;
+  font-size: 32px;
+  line-height: 37px;
+  font-family: Orator W01;
+  text-transform: capitalize;
+}
+
+input, textarea {
   border: 1px solid #e5e5e5;
   outline: none;
 }
@@ -19,6 +92,10 @@ button {
   border-radius: 6px;
   font-size: 14px;
   line-height: normal;
+}
+
+.title {
+  margin-bottom: 40px;
 }
 
 .todo-app {
@@ -32,8 +109,17 @@ button {
 }
 
 .card {
+  position: relative;
   padding: 40px;
   background-color: #fffcf7;
+}
+.card__label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-block;
+  width: 20px;
+  height: 60px;  
 }
 
 .form__title {
@@ -44,6 +130,10 @@ button {
   display: flex;
   flex-direction: column;
   margin-bottom: 15px;
+}
+
+.form__item--is-required .form__label::after {
+  content: "*";
 }
 
 .form__label {
@@ -58,12 +148,30 @@ button {
   font-size: 13px;
 }
 
+.form__error {
+  font-size: 13px;
+  line-height: 14px;
+  color: #9d2a1e;
+}
+
+.form__error::before {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #9d2a1e;
+  border-radius: 50%;
+  line-height: 14px;
+  content: "!";
+  text-align: center;
+  font-weight: bold;
+}
+
 .form__button {
   margin: 10px 0;
   width: 100%;
 }
 
 button.primary {
-  background-color: #444;
-  color: #fff;
+  background-color: var(--primary);;
+  color: var(--white);
 }
