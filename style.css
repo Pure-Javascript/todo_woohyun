@@ -118,9 +118,18 @@ button {
   top: 0;
   right: 0;
   display: inline-block;
-  width: 20px;
-  height: 60px;  
+  width: 70px;
+  height: 20px;
 }
+
+.card__label.red,
+.card__label.blue,
+.card__label.indigo,
+.card__label.pink,
+.card__label.teal {
+  width: 20px;
+  height: 60px;
+} 
 
 .form__title {
   margin: 0 0 20px 0;
@@ -174,4 +183,9 @@ button {
 button.primary {
   background-color: var(--primary);;
   color: var(--white);
+}
+
+.todo-app__list {}
+.list__item {
+  margin: 0 auto 10px;
 }

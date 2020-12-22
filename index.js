@@ -1,14 +1,14 @@
 window.onload = () => {
   const LOCAL_STORAGE_KEY = 'todo-list';
   const COLORS = {
+    red: '#dc3545',
+    green: '#28a745',
     blue: '#007bff',
+    yellow: '#ffc107',
     indigo: '#6610f2',
     purple: '#6f42c1',
     pink: '#e83e8c',
-    red: '#dc3545',
     orange: '#fd7e14',
-    yellow: '#ffc107',
-    green: '#28a745',
     teal: '#20c997',
     cyan: '#17a2b8',
   };
@@ -38,6 +38,7 @@ window.onload = () => {
   }
 
   class Todo {
+    id;
     title;
     content;
     createdAt;
@@ -47,6 +48,7 @@ window.onload = () => {
       if (typeof title === 'undefined') {
         new Error('Title is required');
       }
+      this.id = Date.now();
       this.title = title;
       this.content = content;
       this.createdAt = createdAt;
@@ -68,8 +70,24 @@ window.onload = () => {
   }
 
   const getRandomColor = () => Object.keys(COLORS)[Math.floor(Math.random(0, 12) * 10)];
-
   
+  const renderTodo = ({ id, title, content, createdAt, isDone }) => {
+    if (!id || !title ) {
+      return;
+    }
+    return `
+      <li class="card list__item" data-id=${id}>
+        <span class="card__label ${getRandomColor()}"></span>
+        <h5>
+          ${title}
+        </h5>
+        <h6>
+          ${content}
+        </h6>
+      </li>
+    `
+  }
+
   // Dom elements
   const $app = document.querySelector('.todo-app');
   const $form = $app.querySelector('.todo-app__form');
@@ -82,17 +100,7 @@ window.onload = () => {
   const todoList = new TodoList({ list: storageList });
   const todoListDomString = todoList.list
     .filter((todo) => todo && todo.title)
-    .map(({ title, content, createdAt, isDone }) => `
-      <li class="card list__item">
-        <span class="card__label ${getRandomColor()}"></span>
-        <h5>
-          ${title}
-        </h5>
-        <h6>
-          ${content}
-        </h6>
-      </li>
-    `)
+    .map(renderTodo)
     .join('');
   $todoList.insertAdjacentHTML('beforeend', todoListDomString);
 
@@ -127,9 +135,7 @@ window.onload = () => {
     );
     $todoList.insertAdjacentHTML(
       'beforeend',
-      `<li class="card">
-        <h5>${newTodo.title}</h5>
-      </li>`
+      renderTodo(newTodo),
     );
     
     console.log(todoList);
