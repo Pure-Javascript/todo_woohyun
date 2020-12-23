@@ -18,7 +18,7 @@ window.onload = () => {
     list = [];
 
     constructor({ list }) {
-      this.list = list;
+      this.list = list.map(todo => new Todo(todo));
     }
 
     add({ todo }) {
@@ -26,6 +26,11 @@ window.onload = () => {
         return;
       }
       this.list.push(todo);
+    }
+
+    updateTodo({ todoId, values }) {
+      const targetTodo = this.list.find(({ id }) => id === todoId);
+      targetTodo.set(values);
     }
 
     toggleTodoDone({ index }) {
@@ -44,15 +49,21 @@ window.onload = () => {
     createdAt;
     isDone;
     
-    constructor({ title, content = '', createdAt = new Date(), isDone = false }) {
+    constructor({ id, title, content = '', createdAt = new Date(), isDone = false }) {
       if (typeof title === 'undefined') {
         new Error('Title is required');
       }
-      this.id = Date.now();
+      this.id = id || Date.now();
       this.title = title;
       this.content = content;
       this.createdAt = createdAt;
       this.isDone = isDone;
+    }
+
+    set(values) {
+      Object.entries(values).forEach(([key, value]) => {
+        this[key] = value;
+      });
     }
 
     toggleDone() {
@@ -70,20 +81,30 @@ window.onload = () => {
   }
 
   const getRandomColor = () => Object.keys(COLORS)[Math.floor(Math.random(0, 12) * 10)];
-  
+  const formatDate = (date) => `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}
+   ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+ 
   const renderTodo = ({ id, title, content, createdAt, isDone }) => {
     if (!id || !title ) {
       return;
     }
     return `
-      <li class="card list__item" data-id=${id}>
+      <li class="card list__item todo" data-id=${id}>
         <span class="card__label ${getRandomColor()}"></span>
-        <h5>
-          ${title}
-        </h5>
-        <h6>
-          ${content}
-        </h6>
+        <div class="todo__body">
+          <span class="todo__date">${formatDate(new Date(createdAt))}</span>
+          <h5 class="todo__title">
+            <input class="title__input" value="TEST">
+          </h5>
+          <p class="todo__content">
+            ${content}
+          </p>
+          ${
+            isDone
+              ? `<button>Adjective</button>`
+              : `<button>Done</button>`
+          }
+        </div>
       </li>
     `
   }
@@ -137,7 +158,18 @@ window.onload = () => {
       'beforeend',
       renderTodo(newTodo),
     );
-    
-    console.log(todoList);
+  });
+
+  $todoList.addEventListener('click', ({ target }) => {
+    if (target.classList.contains('title__input')) {
+      target.addEventListener('focusout', () => {
+        const {dataset: {id}} = target.closest('.todo');
+        todoList.updateTodo({ todoId: parseInt(id), values: {title: target.value }});
+        localStorage.setItem(
+          LOCAL_STORAGE_KEY,
+          JSON.stringify(todoList.list),
+        );
+      });
+    }
   });
 }
