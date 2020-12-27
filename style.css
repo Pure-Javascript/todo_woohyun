@@ -55,17 +55,17 @@
 
 body {
   background-color: #f6f1eb;
-  font-family: Arial unicode MS,sans-serif;
+  font-family: monospace;
 }
 
 hr {
   width: 100%;
-  border-top: 1px solid rgba(0,0,0,.1);;
 }
 
-h1, h2, h3, h4, h5, h6, p {
+h1, h2, h3, h4, h5, h6, p, input, button, select {
   color: var(--primary);
   font-weight: normal;
+  font-family: monospace;
 }
 
 ul {
@@ -77,11 +77,10 @@ h1 {
   margin: 12px 0 20px;
   font-size: 32px;
   line-height: 37px;
-  font-family: Orator W01;
   text-transform: capitalize;
 }
 
-input, textarea {
+input, textarea, select {
   border: 1px solid #e5e5e5;
   outline: none;
 }
@@ -106,6 +105,21 @@ button {
   width: 100vw;
   max-width: 480px;
   padding: 24px 36px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.row > * {
+  flex: 1 1 200px;
+  margin-right: 15px;
+}
+
+.row > *:last-child {
+  margin-right: 0;
 }
 
 .card {
@@ -140,7 +154,6 @@ button {
   flex-direction: column;
   margin-bottom: 15px;
 }
-
 .form__item--is-required .form__label::after {
   content: "*";
 }
@@ -155,6 +168,13 @@ button {
   max-width: 400px;
   height: 40px;
   font-size: 13px;
+}
+
+select.form__input {
+  height: 42px;
+  background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #fff;
+  -webkit-appearance: none;
+  background-position-x: calc(100% - 15px);
 }
 
 .form__error {
@@ -179,6 +199,10 @@ button {
   margin: 10px 0;
   width: 100%;
 }
+.form__button:hover {
+  cursor: pointer;
+  opacity: 0.9;
+}
 
 button.primary {
   background-color: var(--primary);;
@@ -200,24 +224,32 @@ button.primary {
 .todo__title {
   position: relative;
   margin: 10px 0;
-  font-size: 20px;
   line-height: 20px;
   color: var(--primary);
+}
+
+.title__input {
+  font-size: 20px;
 }
 
 .todo__title:hover {
   background-color: #efefef;
 }
 
-.todo__title input {
+.todo__body input, .todo__body select {
   display: block;
   width: 100%;
   height: 20px;
-  background-color: rgba(0,0,0,0);
   border: none;
+  background-color: #fffcf7;
 }
 
-.todo__title input:hover {
+.todo__body input:hover, .todo__body input:focus,
+.todo__body select:hover, .todo__body select:focus {
+  background-color: #efefef;
+}
+
+.todo__body > * input:hover {
   cursor: default;
 }
 
@@ -230,7 +262,17 @@ button.primary {
   width: 100%;
 }
 
+.todo__done {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.todo__done--clear {
+  color: var(--primary);
+  background-color: #f6f1eb;
+}
+
 .todo button:hover {
-  opacity: 0.8;
   cursor: pointer;
+  opacity: 0.9;
 }

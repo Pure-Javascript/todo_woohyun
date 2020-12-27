@@ -1,6 +1,6 @@
 window.onload = () => {
   const LOCAL_STORAGE_KEY = 'todo-list';
-  const COLORS = {
+  const COLOR = {
     red: '#dc3545',
     green: '#28a745',
     blue: '#007bff',
@@ -12,6 +12,14 @@ window.onload = () => {
     teal: '#20c997',
     cyan: '#17a2b8',
   };
+  const PRIORITY = {
+    HIGHEST: 'highest',
+    HIGH: 'high',
+    MEDIUM: 'medium',
+    LOW: 'low',
+    LOWEST: 'lowest',
+  };
+
 
   // Classes
   class TodoList {
@@ -47,23 +55,27 @@ window.onload = () => {
     title;
     content;
     createdAt;
+    completeAt;
     isDone;
+    priority;
     
-    constructor({ id, title, content = '', createdAt = new Date(), isDone = false }) {
+    constructor({ id, title, content = '', createdAt = new Date(), isDone = false, completeAt, priority = PRIORITY.MEDIUM }) {
       if (typeof title === 'undefined') {
-        new Error('Title is required');
+        throw new Error('Title is required');
       }
       this.id = id || Date.now();
       this.title = title;
       this.content = content;
       this.createdAt = createdAt;
+      this.completeAt = completeAt;
       this.isDone = isDone;
+      this.priority = priority;
     }
 
     set(values) {
-      Object.entries(values).forEach(([key, value]) => {
+      for (const [key, value] of Object.entries(values)) {
         this[key] = value;
-      });
+      }
     }
 
     toggleDone() {
@@ -80,29 +92,79 @@ window.onload = () => {
     return {};
   }
 
-  const getRandomColor = () => Object.keys(COLORS)[Math.floor(Math.random(0, 12) * 10)];
-  const formatDate = (date) => `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}
-   ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+  const updateStorage = ({ list }) => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
+  }
+
+  const onEditTodo = ({ target }) => {
+    const { dataset: { id }} = target.closest('.todo');
+    const { value, dataset: {key} } = target;
+    todoList.updateTodo({ todoId: parseInt(id), values: {[key]: value }});
+    updateStorage({ list: todoList.list });
+  }
+
+  const getRandomColor = () => Object.keys(COLOR)[Math.floor(Math.random(0, 12) * 10)];
+  const formatDate = (date) => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
  
-  const renderTodo = ({ id, title, content, createdAt, isDone }) => {
-    if (!id || !title ) {
-      return;
-    }
+  const renderTodo = ({ id, title, content, completeAt, isDone, priority }) => {
     return `
       <li class="card list__item todo" data-id=${id}>
         <span class="card__label ${getRandomColor()}"></span>
         <div class="todo__body">
-          <span class="todo__date">${formatDate(new Date(createdAt))}</span>
           <h5 class="todo__title">
-            <input class="title__input" value="TEST">
+            <input class="title__input" data-key="title" value="${title}">
           </h5>
+          <div class="row">
+            <span class="todo__date">
+              ${
+                completeAt
+                ? `<input 
+                    class="content__complete-at"
+                    type="date"
+                    data-key="completeAt"
+                    value="${new Date(completeAt).toISOString().slice(0, 10)}">`
+                : ''
+              }
+            </span>
+            <span class=""todo__priority>
+              <select
+                class="content__priority"
+                data-key="priority">
+                <option
+                  value ="${PRIORITY.HIGHEST}"
+                  ${priority === PRIORITY.HIGHEST ? 'selected' : ''}>
+                  Highest
+                </option>
+                <option
+                  value ="${PRIORITY.HIGH}"
+                  ${priority === PRIORITY.HIGH ? 'selected' : 'none'}>
+                  High
+                </option>
+                <option
+                  value ="${PRIORITY.MEDIUM}"
+                  ${priority === PRIORITY.MEDIUM ? 'selected' : 'none'}>
+                  Medium
+                </option>
+                <option
+                  value ="${PRIORITY.LOW}"
+                  ${priority === PRIORITY.LOW ? 'selected' : 'none'}>
+                  Low
+                </option>
+                <option
+                  value ="${PRIORITY.LOWEST}"
+                  ${priority === PRIORITY.LOWEST ? 'selected' : 'none'}>
+                  Lowest
+                </option>
+              </select>
+            </span>
+          </div>
           <p class="todo__content">
-            ${content}
+            <input class="content__input" data-key="content" value="${content}">
           </p>
           ${
             isDone
-              ? `<button>Adjective</button>`
-              : `<button>Done</button>`
+              ? `<button class="todo__done todo__done--clear" data-key="isDone">Incomplete</button>`
+              : `<button class="todo__done" data-key="isDone">Complete</button>`
           }
         </div>
       </li>
@@ -120,11 +182,10 @@ window.onload = () => {
   const storageList = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
   const todoList = new TodoList({ list: storageList });
   const todoListDomString = todoList.list
-    .filter((todo) => todo && todo.title)
+    .filter((todo) => todo && todo.id)
     .map(renderTodo)
     .join('');
   $todoList.insertAdjacentHTML('beforeend', todoListDomString);
-
 
 
   // Event
@@ -133,10 +194,10 @@ window.onload = () => {
     const { currentTarget } = event;
     const $items = currentTarget.querySelectorAll('.form__item');
     const formEntries = Array.prototype.map.call($items, ($item) => {
-      const {dataset: { key }} = $item;
-      const {value = ''} = $item.querySelector('input, select, textarea');
+      const {value = '', dataset: { key }} = $item.querySelector('input, select, textarea');
       return [key, value];
     });
+    
     const formData = Object.fromEntries(formEntries);
     const {key, message} = checkFormValidation({ data: formData });
     if (key) {
@@ -160,16 +221,33 @@ window.onload = () => {
     );
   });
 
+  $todoList.addEventListener('focusout', (event) => {
+    const { target } = event;
+    if (target.dataset.key && target.tagName !== 'BUTTON') {
+      onEditTodo(event);
+    }
+  });
+
+  $todoList.addEventListener('keydown', (event) => {
+    const { target, target: { dataset: { key } }, code } = event;
+    if (key && code === 'Enter') {
+      onEditTodo(event);
+      target.blur();
+    }
+  });
+
   $todoList.addEventListener('click', ({ target }) => {
-    if (target.classList.contains('title__input')) {
-      target.addEventListener('focusout', () => {
-        const {dataset: {id}} = target.closest('.todo');
-        todoList.updateTodo({ todoId: parseInt(id), values: {title: target.value }});
-        localStorage.setItem(
-          LOCAL_STORAGE_KEY,
-          JSON.stringify(todoList.list),
-        );
+    const { dataset: { key }} = target;
+    const { dataset: { id }} = target.closest('.todo');
+    if (key === 'isDone') {
+      const isDone = target.classList.contains('todo__done--clear');
+      todoList.updateTodo({
+        todoId: parseInt(id),
+        values: { isDone: !isDone }
       });
+      updateStorage({ list: todoList.list });
+      target.innerText = isDone ? 'Complete' : 'Incomplete';
+      (target.classList[isDone ? 'remove' : 'add'])('todo__done--clear');
     }
   });
 }
