@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TODO</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="todo-app">
+    <div class="title">
+        <h1>Todo List</h1>
+        <hr />
+    </div>
+    <form class="todo-app__form card">
+      <section class="form__item form__item--is-required form__item--title">
+        <label for="title" class="form__label">Title</label>
+        <input id="title" class="form__input" data-key="title" />
+      </section>
+      <div class="row">
+          <section class="form__item form__item--title">
+            <label for="complete-at" class="form__label">Complete date</label>
+            <input id="complete-at" class="form__input" type="date" data-key="completeAt" />
+          </section>
+          <section class="form__item form__item--priority">
+            <label for="priority" class="form__label">Priority</label>
+            <select id="priority" class="form__input" data-key="priority">
+              <option>Highest</option>
+              <option>High</option>
+              <option selected>Medium</option>
+              <option>Low</option>
+              <option>Lowest</option>
+            </select>
+          </section>
+      </div>
+      <section class="form__item form__item--content">
+        <label for="content" class="form__label">Content</label>
+        <input id="content" class="form__input" data-key="content" />
+      </section>
+      <button type="submit" class="form__button primary">Add</button>
+    </form>
+    <ul class="todo-app__list"></ul>
+  </div>
+  <script type="text/javascript" src="./index.js"></script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+:root {
+  --blue: #007bff;
+  --indigo: #6610f2;
+  --purple: #6f42c1;
+  --pink: #e83e8c;
+  --red: #dc3545;
+  --orange: #fd7e14;
+  --yellow: #ffc107;
+  --green: #28a745;
+  --teal: #20c997;
+  --cyan: #17a2b8;
+  --white: #fff;
+  --gray: #6c757d;
+  --gray-dark: #343a40;
+  --primary: #444;
+  --secondary: #6c757d;
+  --success: #28a745;
+  --info: #17a2b8;
+  --warning: #ffc107;
+  --danger: #dc3545;
+  --light: #f8f9fa;
+  --dark: #343a40;
+}
+
+.blue {
+  background-color: var(--blue);
+}
+.indigo {
+  background-color: var(--indigo);
+}
+.purple {
+  background-color: var(--purple);
+}
+.pink {
+  background-color: var(--pink);
+}
+.red {
+  background-color: var(--red);
+}
+.orange {
+  background-color: var(--orange);
+}
+.yellow {
+  background-color: var(--yellow);
+}
+.green {
+  background-color: var(--green);
+}
+.teal {
+  background-color: var(--teal);
+}
+.cyan {
+  background-color: var(--cyan);
+}
+
+body {
+  background-color: #f6f1eb;
+  font-family: monospace;
+}
+
+hr {
+  width: 100%;
+}
+
+h1, h2, h3, h4, h5, h6, p, input, button, select {
+  color: var(--primary);
+  font-weight: normal;
+  font-family: monospace;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+h1 {
+  margin: 12px 0 20px;
+  font-size: 32px;
+  line-height: 37px;
+  text-transform: capitalize;
+}
+
+input, textarea, select {
+  border: 1px solid #e5e5e5;
+  outline: none;
+}
+
+button {
+  padding: 15px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: normal;
+}
+
+.title {
+  margin-bottom: 40px;
+}
+
+.todo-app {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 auto;
+  width: 100vw;
+  max-width: 480px;
+  padding: 24px 36px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.row > * {
+  flex: 1 1 200px;
+  margin-right: 15px;
+}
+
+.row > *:last-child {
+  margin-right: 0;
+}
+
+.card {
+  position: relative;
+  padding: 40px;
+  background-color: #fffcf7;
+}
+.card__label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-block;
+  width: 70px;
+  height: 20px;
+}
+
+.card__label.red,
+.card__label.blue,
+.card__label.indigo,
+.card__label.pink,
+.card__label.teal {
+  width: 20px;
+  height: 60px;
+} 
+
+.form__title {
+  margin: 0 0 20px 0;
+}
+
+.form__item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+.form__item--is-required .form__label::after {
+  content: "*";
+}
+
+.form__label {
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.form__input {
+  padding: 0 15px;
+  max-width: 400px;
+  height: 40px;
+  font-size: 13px;
+}
+
+select.form__input {
+  height: 42px;
+  background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #fff;
+  -webkit-appearance: none;
+  background-position-x: calc(100% - 15px);
+}
+
+.form__error {
+  font-size: 13px;
+  line-height: 14px;
+  color: #9d2a1e;
+}
+
+.form__error::before {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #9d2a1e;
+  border-radius: 50%;
+  line-height: 14px;
+  content: "!";
+  text-align: center;
+  font-weight: bold;
+}
+
+.form__button {
+  margin: 10px 0;
+  width: 100%;
+}
+.form__button:hover {
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+button.primary {
+  background-color: var(--primary);;
+  color: var(--white);
+}
+
+.todo-app__list {}
+.list__item {
+  margin: 0 auto 10px;
+}
+.todo__date {
+  line-height: 22px;
+  font-size: 14px;
+  font-weight: 700;
+  font-size: normal;
+  color: #4a4a4a;
+}
+
+.todo__title {
+  position: relative;
+  margin: 10px 0;
+  line-height: 20px;
+  color: var(--primary);
+}
+
+.title__input {
+  font-size: 20px;
+}
+
+.todo__title:hover {
+  background-color: #efefef;
+}
+
+.todo__body input, .todo__body select {
+  display: block;
+  width: 100%;
+  height: 20px;
+  border: none;
+  background-color: #fffcf7;
+}
+
+.todo__body input:hover, .todo__body input:focus,
+.todo__body select:hover, .todo__body select:focus {
+  background-color: #efefef;
+}
+
+.todo__body > * input:hover {
+  cursor: default;
+}
+
+.todo__content {
+  margin: 10px 0;
+  color: #4a4a4a;
+}
+
+.todo button {
+  width: 100%;
+}
+
+.todo__done {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.todo__done--clear {
+  color: var(--primary);
+  background-color: #f6f1eb;
+}
+
+.todo button:hover {
+  cursor: pointer;
+  opacity: 0.9;
+}
