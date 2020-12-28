@@ -68,14 +68,16 @@ window.onload = () => {
       if (typeof title === 'undefined') {
         throw new Error('Title is required');
       }
-      this.id = id || Date.now().toString();
+      this.id = isId(id) ? id : Date.now().toString();
       this.title = title;
       this.content = content;
       this.createdAt = createdAt;
       this.completeAt = completeAt;
       this.isDone = isDone;
       this.priority = priority;
-      this.parentId = parentId;
+      if (isId(parentId)) {
+        this.parentId = parentId;
+      }
     }
 
     set(values) {
@@ -91,6 +93,7 @@ window.onload = () => {
 
 
   // functions
+  const isId = (id) => !isNaN(parseInt(id));
   const checkFormValidation = ({ data: { title = '' }}) => {
     if (title.length === 0) {
       return {key: 'title', message: 'title is required'};
@@ -114,7 +117,7 @@ window.onload = () => {
  
   const renderTodo = ({ id, title, content, completeAt, isDone, priority }) => {
     return `
-      <li class="card list__item todo" data-id=${id}>
+      <li class="card list__item todo" data-id=${id} draggable=true>
         <span class="card__label ${getRandomColor()}"></span>
         <div class="todo__body">
           <h5 class="todo__title">
@@ -186,10 +189,10 @@ window.onload = () => {
       .map(renderTodo)
       .join('');
     $todoList.innerHTML = todoListDomString;
+
     $todoList.dataset.id = parentId;
   
     $moveParent.classList[parentId ? 'add' : 'remove']('move-parent__visible');
-
 
     const parentTodo = list.find(({ id }) => id === parentId);
     $parentName.innerText = parentTodo ? `${parentTodo.title}'s ` : '';
@@ -248,6 +251,7 @@ window.onload = () => {
     );
   });
 
+  // edit
   $todoList.addEventListener('focusout', (event) => {
     const { target } = event;
     if (target.dataset.key && target.tagName !== 'BUTTON') {
@@ -255,6 +259,7 @@ window.onload = () => {
     }
   });
 
+  // edit
   $todoList.addEventListener('keydown', (event) => {
     const { target, target: { dataset: { key } }, code } = event;
     if (key && code === 'Enter') {
@@ -265,6 +270,9 @@ window.onload = () => {
 
   $todoList.addEventListener('click', ({ target }) => {
     const $todo = target.closest('.todo');
+    if (!$todo) {
+      return;
+    }
     const { dataset: { id: todoId }} = $todo;
     // toggle done
     if (target.classList.contains('todo__done')) {
@@ -291,7 +299,22 @@ window.onload = () => {
       return;
     }
   });
+  $todoList.addEventListener('drag', (event) => {
+    const {target, clientX, clientY} = event;
+    let swapItem = document.elementFromPoint(clientX, clientY) || target;
+    if (swapItem.parentNode === $todoList) {
+      swapItem = swapItem !== target.nextSibling
+        ? swapItem
+        : swapItem.nextSibling;
+      $todoList.insertBefore(target, swapItem);
+    }
+  });
 
+  $todoList.addEventListener('dragover', (event) => {
+    event.preventDefault();
+  }, false);
+
+  // move to parent
   $moveParent.addEventListener('click', () => {
     const {parentId} = todoList.list.find(({ id }) => id === $todoList.dataset.id);
     renderTodos({ todoList: todoList, parentId });
