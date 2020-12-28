@@ -64,18 +64,19 @@ window.onload = () => {
     priority;
     parentId;
     
-    constructor({ id, title, content = '', createdAt = new Date(), isDone = false, completeAt, priority = PRIORITY.MEDIUM, parentId }) {
+    constructor({ id, title, content = '', createdAt = new Date(), isDone = false, completeAt, order = 1, priority = PRIORITY.MEDIUM, parentId }) {
       if (typeof title === 'undefined') {
         throw new Error('Title is required');
       }
-      this.id = isId(id) ? id : Date.now().toString();
+      this.id = isNumberString(id) ? id : Date.now().toString();
       this.title = title;
       this.content = content;
       this.createdAt = createdAt;
       this.completeAt = completeAt;
       this.isDone = isDone;
       this.priority = priority;
-      if (isId(parentId)) {
+      this.order = isNumberString(order) ? parseInt(order) : 1;
+      if (isNumberString(parentId)) {
         this.parentId = parentId;
       }
     }
@@ -93,7 +94,7 @@ window.onload = () => {
 
 
   // functions
-  const isId = (id) => !isNaN(parseInt(id));
+  const isNumberString = (id) => !isNaN(parseInt(id));
   const checkFormValidation = ({ data: { title = '' }}) => {
     if (title.length === 0) {
       return {key: 'title', message: 'title is required'};
@@ -108,14 +109,14 @@ window.onload = () => {
   const onEditTodo = ({ target }) => {
     const { dataset: { id }} = target.closest('.todo');
     const { value, dataset: {key} } = target;
-    todoList.updateTodo({ todoId: parseInt(id), values: {[key]: value }});
+    todoList.updateTodo({ todoId: id, values: {[key]: value }});
     updateStorage({ list: todoList.list });
   }
 
   const getRandomColor = () => Object.keys(COLOR)[Math.floor(Math.random(0, 12) * 10)];
-  const formatDate = (date) => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
  
   const renderTodo = ({ id, title, content, completeAt, isDone, priority }) => {
+    console.log(title, priority);
     return `
       <li class="card list__item todo" data-id=${id} draggable=true>
         <span class="card__label ${getRandomColor()}"></span>
@@ -142,22 +143,22 @@ window.onload = () => {
                 </option>
                 <option
                   value ="${PRIORITY.HIGH}"
-                  ${priority === PRIORITY.HIGH ? 'selected' : 'none'}>
+                  ${priority === PRIORITY.HIGH ? 'selected' : ''}>
                   High
                 </option>
                 <option
                   value ="${PRIORITY.MEDIUM}"
-                  ${priority === PRIORITY.MEDIUM ? 'selected' : 'none'}>
+                  ${priority === PRIORITY.MEDIUM ? 'selected' : ''}>
                   Medium
                 </option>
                 <option
                   value ="${PRIORITY.LOW}"
-                  ${priority === PRIORITY.LOW ? 'selected' : 'none'}>
+                  ${priority === PRIORITY.LOW ? 'selected' : ''}>
                   Low
                 </option>
                 <option
                   value ="${PRIORITY.LOWEST}"
-                  ${priority === PRIORITY.LOWEST ? 'selected' : 'none'}>
+                  ${priority === PRIORITY.LOWEST ? 'selected' : ''}>
                   Lowest
                 </option>
               </select>
@@ -186,6 +187,7 @@ window.onload = () => {
     const { list } = todoList;
     const todoListDomString = list
       .filter((todo) => todo?.id && parentId === todo.parentId)
+      .sort((prev, next) => prev.order - next.order)
       .map(renderTodo)
       .join('');
     $todoList.innerHTML = todoListDomString;
@@ -213,6 +215,7 @@ window.onload = () => {
   const storageList = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
   const todoList = new TodoList({ list: storageList });
   renderTodos({ todoList });
+
 
 
   // Event
@@ -299,6 +302,8 @@ window.onload = () => {
       return;
     }
   });
+
+  // drag & sort
   $todoList.addEventListener('drag', (event) => {
     const {target, clientX, clientY} = event;
     let swapItem = document.elementFromPoint(clientX, clientY) || target;
@@ -313,6 +318,15 @@ window.onload = () => {
   $todoList.addEventListener('dragover', (event) => {
     event.preventDefault();
   }, false);
+
+  $todoList.addEventListener('drop', () => {
+    const todos = $todoList.querySelectorAll('li');
+    for (let index = 0; index < todos.length; index++) {
+      const {dataset: {id}} = todos[index];
+      todoList.updateTodo({ todoId: id, values: {order: index + 1}});
+    }
+    updateStorage({ list: todoList.list });
+  });
 
   // move to parent
   $moveParent.addEventListener('click', () => {
