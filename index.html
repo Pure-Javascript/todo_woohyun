@@ -7,29 +7,32 @@
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <div class="todo-app">
+  <div class="todo-app todo-app__loading">
     <div class="title">
         <h1>Todo List</h1>
-        <hr />
+    </div>
+    <div class="sub-title" data-subject="addTodo">
+      <h2>Add Todo</h2>
+      <hr />
     </div>
     <form class="todo-app__form card">
-      <section class="form__item form__item--is-required form__item--title">
+      <section class="form__item form__item--is-required form__item--title" data-key="title">
         <label for="title" class="form__label">Title</label>
-        <input id="title" class="form__input" data-key="title" />
+        <input id="title" class="form__input" />
       </section>
       <div class="row">
-          <section class="form__item form__item--title">
+          <section class="form__item form__item--title" data-key="completeAt">
             <label for="complete-at" class="form__label">Complete date</label>
-            <input id="complete-at" class="form__input" type="date" data-key="completeAt" />
+            <input id="complete-at" class="form__input" type="date" />
           </section>
-          <section class="form__item form__item--priority">
+          <section class="form__item form__item--priority" data-key="priority">
             <label for="priority" class="form__label">Priority</label>
-            <select id="priority" class="form__input" data-key="priority">
-              <option>Highest</option>
-              <option>High</option>
-              <option selected>Medium</option>
-              <option>Low</option>
-              <option>Lowest</option>
+            <select id="priority" class="form__input">
+              <option value="highest">Highest</option>
+              <option value="high">High</option>
+              <option value="medium" selected>Medium</option>
+              <option value="low">Low</option>
+              <option value="lowest">Lowest</option>
             </select>
           </section>
       </div>
@@ -39,6 +42,13 @@
       </section>
       <button type="submit" class="form__button primary">Add</button>
     </form>
+    <div class="sub-title" data-subject="todoList">
+      <div class="row">
+        <h2><span class="parent-name"></span>Todo List</h2>
+        <button class="move-parent"></button>
+      </div>
+      <hr />
+    </div>
     <ul class="todo-app__list"></ul>
   </div>
   <script type="text/javascript" src="./index.js"></script>
