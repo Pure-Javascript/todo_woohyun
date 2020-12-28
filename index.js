@@ -187,19 +187,12 @@ window.onload = () => {
       .join('');
     $todoList.innerHTML = todoListDomString;
     $todoList.dataset.id = parentId;
+  
+    $moveParent.classList[parentId ? 'add' : 'remove']('move-parent__visible');
 
-    // render path
-    const pathList = [list.find(({ id }) => id === parentId)];
-    while(pathList[pathList.length - 1]?.parentId) {
-      pathList.push(list.find(({ id }) => id === pathList[pathList.length - 1].parentId));
-    }
 
-    const pathListString = pathList
-      .filter((todo) => !!todo)
-      .map(({ id, title }) => `<span class="path-list__path" data-id="${id}">${title}</span>`)
-      .reverse()
-      .join('/');
-    $pathList.innerHTML = pathListString;
+    const parentTodo = list.find(({ id }) => id === parentId);
+    $parentName.innerText = parentTodo ? `${parentTodo.title}'s ` : '';
   }
 
 
@@ -207,7 +200,8 @@ window.onload = () => {
   // Dom elements
   const $app = document.querySelector('.todo-app');
   const $form = $app.querySelector('.todo-app__form');
-  const $pathList = $app.querySelector('.path-list');
+  const $moveParent = $app.querySelector('.move-parent');
+  const $parentName = $app.querySelector('.parent-name');
   const $todoList = $app.querySelector('.todo-app__list');
 
 
@@ -298,11 +292,9 @@ window.onload = () => {
     }
   });
 
-  $pathList.addEventListener('click', ({ target }) => {
-    if (target.classList.contains('path-list__path')) {
-      renderTodos({ todoList: todoList, parentId: target.dataset.id });
-      return;
-    }
+  $moveParent.addEventListener('click', () => {
+    const {parentId} = todoList.list.find(({ id }) => id === $todoList.dataset.id);
+    renderTodos({ todoList: todoList, parentId });
   });
 }
 

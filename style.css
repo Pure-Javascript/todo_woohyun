@@ -98,14 +98,23 @@ button {
   margin: 20px 0;
 }
 
-.path-list {
-  position: absolute;
-  right: 0;
+button.move-parent {
+  display: none;
+  flex: 0 0 50px;
+  padding: 0;
+  width: fit-content;
+  height: 23px;
+  outline: none;
+  background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_up.png) no-repeat right;
 }
 
-.path-list__path:hover {
+button.move-parent__visible {
+  display: block;
+}
+
+button.move-parent:hover {
+  opacity: 0.8;
   cursor: pointer;
-  text-decoration: underline;
 }
 
 .todo-app {
@@ -122,6 +131,7 @@ button {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 }
 
 .row > * {
@@ -212,7 +222,7 @@ select.form__input {
 }
 .form__button:hover {
   cursor: pointer;
-  opacity: 0.9;
+  opacity: 0.8;
 }
 
 button.primary {
@@ -289,5 +299,5 @@ button.primary {
 
 .todo button:hover {
   cursor: pointer;
-  opacity: 0.9;
+  opacity: 0.8;
 }
