@@ -36,6 +36,10 @@ window.onload = () => {
       this.list.push(todo);
     }
 
+    remove({ todoId }) {
+      this.list = this.list.filter(({ id }) => id !== todoId);
+    }
+
     updateTodo({ todoId, values }) {
       const targetTodo = this.list.find(({ id }) => id === todoId);
       targetTodo.set(values);
@@ -58,18 +62,20 @@ window.onload = () => {
     completeAt;
     isDone;
     priority;
+    parentId;
     
-    constructor({ id, title, content = '', createdAt = new Date(), isDone = false, completeAt, priority = PRIORITY.MEDIUM }) {
+    constructor({ id, title, content = '', createdAt = new Date(), isDone = false, completeAt, priority = PRIORITY.MEDIUM, parentId }) {
       if (typeof title === 'undefined') {
         throw new Error('Title is required');
       }
-      this.id = id || Date.now();
+      this.id = id || Date.now().toString();
       this.title = title;
       this.content = content;
       this.createdAt = createdAt;
       this.completeAt = completeAt;
       this.isDone = isDone;
       this.priority = priority;
+      this.parentId = parentId;
     }
 
     set(values) {
@@ -116,15 +122,11 @@ window.onload = () => {
           </h5>
           <div class="row">
             <span class="todo__date">
-              ${
-                completeAt
-                ? `<input 
-                    class="content__complete-at"
-                    type="date"
-                    data-key="completeAt"
-                    value="${new Date(completeAt).toISOString().slice(0, 10)}">`
-                : ''
-              }
+            <input 
+              class="content__complete-at"
+              type="date"
+              data-key="completeAt"
+              value="${completeAt && new Date(completeAt).toISOString().slice(0, 10)}">
             </span>
             <span class=""todo__priority>
               <select
@@ -161,19 +163,51 @@ window.onload = () => {
           <p class="todo__content">
             <input class="content__input" data-key="content" value="${content}">
           </p>
-          ${
-            isDone
-              ? `<button class="todo__done todo__done--clear" data-key="isDone">Incomplete</button>`
-              : `<button class="todo__done" data-key="isDone">Complete</button>`
-          }
+          <div class="todo__buttons row">
+            <button class="todo__delete">Delete</button>
+            ${
+              isDone
+                ? `<button class="todo__done todo__done--clear">Incomplete</button>`
+                : `<button class="todo__done">Complete</button>`
+            }
+          </div>
         </div>
       </li>
     `
   }
 
+  const renderTodos = ({ todoList, parentId }) => {
+    if (!todoList?.list) {
+      return;
+    }
+    const { list } = todoList;
+    const todoListDomString = list
+      .filter((todo) => todo?.id && parentId === todo.parentId)
+      .map(renderTodo)
+      .join('');
+    $todoList.innerHTML = todoListDomString;
+    $todoList.dataset.id = parentId;
+
+    // render path
+    const pathList = [list.find(({ id }) => id === parentId)];
+    while(pathList[pathList.length - 1]?.parentId) {
+      pathList.push(list.find(({ id }) => id === pathList[pathList.length - 1].parentId));
+    }
+
+    const pathListString = pathList
+      .filter((todo) => !!todo)
+      .map(({ id, title }) => `<span class="path-list__path" data-id="${id}">${title}</span>`)
+      .reverse()
+      .join('/');
+    $pathList.innerHTML = pathListString;
+  }
+
+
+
   // Dom elements
   const $app = document.querySelector('.todo-app');
   const $form = $app.querySelector('.todo-app__form');
+  const $pathList = $app.querySelector('.path-list');
   const $todoList = $app.querySelector('.todo-app__list');
 
 
@@ -181,11 +215,7 @@ window.onload = () => {
   // Initialize
   const storageList = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
   const todoList = new TodoList({ list: storageList });
-  const todoListDomString = todoList.list
-    .filter((todo) => todo && todo.id)
-    .map(renderTodo)
-    .join('');
-  $todoList.insertAdjacentHTML('beforeend', todoListDomString);
+  renderTodos({ todoList });
 
 
   // Event
@@ -194,7 +224,8 @@ window.onload = () => {
     const { currentTarget } = event;
     const $items = currentTarget.querySelectorAll('.form__item');
     const formEntries = Array.prototype.map.call($items, ($item) => {
-      const {value = '', dataset: { key }} = $item.querySelector('input, select, textarea');
+      const {dataset: { key }} = $item;
+      const {value = ''} = $item.querySelector('input, select, textarea');
       return [key, value];
     });
     
@@ -202,6 +233,7 @@ window.onload = () => {
     const {key, message} = checkFormValidation({ data: formData });
     if (key) {
       const $invalidItem = currentTarget.querySelector(`.form__item[data-key=${key}]`);
+      $invalidItem.querySelector('.form__error')?.remove();
       $invalidItem.insertAdjacentHTML('beforeEnd', `
         <span class="form__error">
           ${message}
@@ -209,7 +241,8 @@ window.onload = () => {
       `);
       return;
     }
-    const newTodo = new Todo(formData);
+  
+    const newTodo = new Todo({ ...formData, parentId: $todoList.dataset.id });
     todoList.add({ todo: newTodo });
     localStorage.setItem(
       LOCAL_STORAGE_KEY,
@@ -237,17 +270,39 @@ window.onload = () => {
   });
 
   $todoList.addEventListener('click', ({ target }) => {
-    const { dataset: { key }} = target;
-    const { dataset: { id }} = target.closest('.todo');
-    if (key === 'isDone') {
+    const $todo = target.closest('.todo');
+    const { dataset: { id: todoId }} = $todo;
+    // toggle done
+    if (target.classList.contains('todo__done')) {
       const isDone = target.classList.contains('todo__done--clear');
       todoList.updateTodo({
-        todoId: parseInt(id),
+        todoId,
         values: { isDone: !isDone }
       });
       updateStorage({ list: todoList.list });
       target.innerText = isDone ? 'Complete' : 'Incomplete';
       (target.classList[isDone ? 'remove' : 'add'])('todo__done--clear');
+      return;
+    }
+    // delete todo
+    if (target.classList.contains('todo__delete') && confirm('Want to delete?')) {
+      todoList.remove({ todoId });
+      updateStorage({ list: todoList.list });
+      $todo.remove();
+      return;
+    }
+    // move
+    if (target.classList.contains('todo')) {
+      renderTodos({ todoList: todoList, parentId: todoId });
+      return;
+    }
+  });
+
+  $pathList.addEventListener('click', ({ target }) => {
+    if (target.classList.contains('path-list__path')) {
+      renderTodos({ todoList: todoList, parentId: target.dataset.id });
+      return;
     }
   });
 }
+

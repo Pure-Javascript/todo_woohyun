@@ -93,8 +93,19 @@ button {
   line-height: normal;
 }
 
-.title {
-  margin-bottom: 40px;
+.sub-title {
+  position: relative;
+  margin: 20px 0;
+}
+
+.path-list {
+  position: absolute;
+  right: 0;
+}
+
+.path-list__path:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .todo-app {
@@ -213,6 +224,10 @@ button.primary {
 .list__item {
   margin: 0 auto 10px;
 }
+.todo:hover {
+  cursor: pointer;
+  opacity: 0.8;;
+}
 .todo__date {
   line-height: 22px;
   font-size: 14px;
@@ -269,7 +284,7 @@ button.primary {
 
 .todo__done--clear {
   color: var(--primary);
-  background-color: #f6f1eb;
+  background-color: #efefef;
 }
 
 .todo button:hover {
