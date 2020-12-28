@@ -116,7 +116,6 @@ window.onload = () => {
   const getRandomColor = () => Object.keys(COLOR)[Math.floor(Math.random(0, 12) * 10)];
  
   const renderTodo = ({ id, title, content, completeAt, isDone, priority }) => {
-    console.log(title, priority);
     return `
       <li class="card list__item todo" data-id=${id} draggable=true>
         <span class="card__label ${getRandomColor()}"></span>
@@ -200,6 +199,17 @@ window.onload = () => {
     $parentName.innerText = parentTodo ? `${parentTodo.title}'s ` : '';
   }
 
+  const resetFields = () => {
+    const formInputs = $form.querySelectorAll('.form__input');
+    for (const $input of formInputs) {
+      if ($input.id === 'priority') {
+        $input.value = PRIORITY.MEDIUM;
+        return;
+      }
+      $input.value = '';
+    }
+  }
+
 
 
   // Dom elements
@@ -212,6 +222,10 @@ window.onload = () => {
 
 
   // Initialize
+  // loading
+  setTimeout(() => {
+    $app.classList.remove('todo-app__loading');
+  }, 3000);
   const storageList = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
   const todoList = new TodoList({ list: storageList });
   renderTodos({ todoList });
@@ -221,6 +235,10 @@ window.onload = () => {
   // Event
   $form.addEventListener('submit', (event) => {
     event.preventDefault();
+    for (const $error of $form.querySelectorAll('.form__error')) {
+      $error.remove();
+    }
+  
     const { currentTarget } = event;
     const $items = currentTarget.querySelectorAll('.form__item');
     const formEntries = Array.prototype.map.call($items, ($item) => {
@@ -233,7 +251,6 @@ window.onload = () => {
     const {key, message} = checkFormValidation({ data: formData });
     if (key) {
       const $invalidItem = currentTarget.querySelector(`.form__item[data-key=${key}]`);
-      $invalidItem.querySelector('.form__error')?.remove();
       $invalidItem.insertAdjacentHTML('beforeEnd', `
         <span class="form__error">
           ${message}
@@ -242,6 +259,10 @@ window.onload = () => {
       return;
     }
   
+    if(!confirm('Want to add?')) {
+      return;
+    }
+    resetFields();
     const newTodo = new Todo({ ...formData, parentId: $todoList.dataset.id });
     todoList.add({ todo: newTodo });
     localStorage.setItem(
