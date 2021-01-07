@@ -177,6 +177,12 @@ button.move-parent:hover {
   padding: 40px;
   background-color: var(--card-color);
 }
+
+@media (max-width: 600px) {
+  .card {
+    padding: 40px 25px;
+  }
+}
 .card__label {
   position: absolute;
   top: 0;
