@@ -1,5 +1,7 @@
 window.onload = () => {
   const LOCAL_STORAGE_KEY = 'todo-list';
+  const NOTIFY_VISIBLE_CLASS_NAME = 'todo-app__notify__visible';
+
   const COLOR = {
     red: '#dc3545',
     green: '#28a745',
@@ -90,13 +92,17 @@ window.onload = () => {
     toggleDone() {
       this.isDone = !this.isDone;
     }
+
+    isExpired() {
+      return (new Date(this.completeAt) - new Date()) < 0;
+    }
   }
 
 
   // functions
   const isNumberString = (id) => !isNaN(parseInt(id));
   const checkFormValidation = ({ data: { title = '' }}) => {
-    if (title.length === 0) {
+    if (title.trim().length === 0) {
       return {key: 'title', message: 'title is required'};
     }
     return {};
@@ -210,6 +216,17 @@ window.onload = () => {
     }
   }
 
+  showExpiredTodos = ({ todoList }) => {
+    const content = todoList.list
+      .filter((todo) => todo.isExpired())
+      .map(({ title }) => `<div>${title}</div>`)
+      .join('');
+    if (content.length > 0) {
+      $notify.classList.add(NOTIFY_VISIBLE_CLASS_NAME);
+      $notifyContent.innerHTML = content;
+    }
+  }
+
 
 
   // Dom elements
@@ -218,6 +235,9 @@ window.onload = () => {
   const $moveParent = $app.querySelector('.move-parent');
   const $parentName = $app.querySelector('.parent-name');
   const $todoList = $app.querySelector('.todo-app__list');
+  const $notify = $app.querySelector('.todo-app__notify');
+  const $notifyCloseButton = $notify.querySelector('.notify__close-button');
+  const $notifyContent = $notify.querySelector('.notify__content');
 
 
 
@@ -225,14 +245,19 @@ window.onload = () => {
   // loading
   setTimeout(() => {
     $app.classList.remove('todo-app__loading');
-  }, 3000);
+  }, 100);
   const storageList = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
   const todoList = new TodoList({ list: storageList });
   renderTodos({ todoList });
+  showExpiredTodos({ todoList });
 
 
 
   // Event
+  $notifyCloseButton.addEventListener('click', () => {
+    $notify.classList.remove(NOTIFY_VISIBLE_CLASS_NAME);
+  });
+  
   $form.addEventListener('submit', (event) => {
     event.preventDefault();
     for (const $error of $form.querySelectorAll('.form__error')) {
