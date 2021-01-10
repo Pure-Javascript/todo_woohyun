@@ -361,6 +361,7 @@ window.onload = () => {
     }
   });
 
+  // prevent animation
   $todoList.addEventListener('dragover', (event) => {
     event.preventDefault();
   }, false);
