@@ -31,6 +31,7 @@
   --danger: #dc3545;
   --light: #f8f9fa;
   --dark: #343a40;
+  --card-color: #fffcf7;
 }
 
 .blue {
@@ -73,7 +74,7 @@ hr {
   width: 100%;
 }
 
-h1, h2, h3, h4, h5, h6, p, input, button, select {
+h1, h2, h3, h4, h5, h6, p, input, button, select, hr {
   color: var(--primary);
   font-weight: normal;
   font-family: monospace;
@@ -174,7 +175,13 @@ button.move-parent:hover {
 .card {
   position: relative;
   padding: 40px;
-  background-color: #fffcf7;
+  background-color: var(--card-color);
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 40px 25px;
+  }
 }
 .card__label {
   position: absolute;
@@ -327,4 +334,79 @@ button.primary {
 .todo button:hover {
   cursor: pointer;
   opacity: 0.8;
+}
+
+.todo-app__notify {
+  position: absolute;
+  top: 97px;
+  right: 6%;
+  display: none;
+  width: 375px;
+  box-shadow: 0 16px 16px rgba(217,207,196,.49);
+  padding: 25px;
+  background-color: var(--card-color);
+}
+
+@media (max-width: 600px) {
+  .todo-app__notify {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: auto;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -16px 16px rgba(217,207,196,.49);
+  }
+}
+
+.todo-app__notify.todo-app__notify__visible {
+  display: block;
+}
+.todo-app__notify.todo-app__notify__visible::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #fffcf7;
+  border-left: 5px solid transparent;
+  position: absolute;
+  right: 16.5%;
+  top: -10px;
+}
+
+@media (max-width: 600px) {
+  .todo-app__notify.todo-app__notify__visible::before {
+    display: none;
+  }
+}
+
+.notify__close-button {
+  position: absolute;
+  top: 13px;
+  right: 20px;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: none;
+}
+.notify__close-button:hover {
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .notify__close-button {
+    right: 70px;
+  }
+}
+
+.notify__header {
+  display: flex;
+  height: 30px;
+  font-size: 16px;
+}
+
+.icon__close {
+  margin-left: auto;
+/* transform: scale(0.03); */
 }

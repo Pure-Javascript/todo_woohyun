@@ -10,3 +10,8 @@ Javascript study
 - Alert about todos that end date is over.
 - Todos have to be maintained even if the browser is refreshed.
 - Todo can contains sub-todos(Optional).
+
+
+## focus
+- submit & check validation logic
+- drag & sort
